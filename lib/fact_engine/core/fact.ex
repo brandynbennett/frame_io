@@ -16,7 +16,7 @@ defmodule FactEngine.Core.Fact do
 
   defstruct statement: nil, arguments: []
 
-  @fact_regex ~r/([\w_]+)\s?\((\w+)*(?:,\s?(\w+))?\)/
+  @fact_regex ~r/^([\w_]+)\s?\(((?:\w+)*(?:,\s?\w+)*)\)$/
 
   @doc """
   Create a new Fact
@@ -50,11 +50,19 @@ defmodule FactEngine.Core.Fact do
     {:error, "#{str} is not a valid fact"}
   end
 
-  defp from_list([_statement | []], _str) do
+  defp from_list([_statement], _str) do
     {:error, "Facts must have on or more arguments"}
   end
 
-  defp from_list([statement | arguments], _str) do
-    {:ok, new(statement: statement, arguments: arguments)}
+  defp from_list([_statement, ""], _str) do
+    {:error, "Facts must have on or more arguments"}
+  end
+
+  defp from_list([statement, arguments], _str) do
+    {:ok, new(statement: statement, arguments: split_arguments(arguments))}
+  end
+
+  defp split_arguments(arguments) do
+    String.split(arguments, ",") |> Enum.map(&String.trim/1)
   end
 end

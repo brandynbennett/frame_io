@@ -4,9 +4,19 @@ defmodule FactEngine.Core.FactTest do
   alias FactEngine.Core.Fact
 
   describe "from_string/1" do
-    test "creates new fact from valid string" do
+    test "creates new fact from two args" do
       assert {:ok, %Fact{statement: "are_friends", arguments: ["alex", "sam"]}} =
                Fact.from_string("are_friends (alex, sam)")
+    end
+
+    test "creates new fact from one arg" do
+      assert {:ok, %Fact{statement: "are_friends", arguments: ["alex"]}} =
+               Fact.from_string("are_friends (alex)")
+    end
+
+    test "creates new fact from three args" do
+      assert {:ok, %Fact{statement: "are_friends", arguments: ["alex", "sam", "brian"]}} =
+               Fact.from_string("are_friends (alex, sam, brian)")
     end
 
     test "non-string returns errors" do

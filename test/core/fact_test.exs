@@ -19,6 +19,11 @@ defmodule FactEngine.Core.FactTest do
                Fact.from_string("are_friends (alex, sam, brian)")
     end
 
+    test "creates new fact no white-space" do
+      assert {:ok, %Fact{statement: "are_friends", arguments: ["alex", "sam", "brian"]}} =
+               Fact.from_string("are_friends(alex,sam,brian)")
+    end
+
     test "non-string returns errors" do
       assert {:error, "Fact.from_string/1 expects a String, got foo"} == Fact.from_string(:foo)
     end
@@ -26,6 +31,11 @@ defmodule FactEngine.Core.FactTest do
     test "no arguments returns errors" do
       assert {:error, "Facts must have on or more arguments"} ==
                Fact.from_string("are_friends ()")
+    end
+
+    test "missing arguments returns errors" do
+      assert {:error, "are_friends (sam,,brian) is not a valid fact"} ==
+               Fact.from_string("are_friends (sam,,brian)")
     end
 
     test "unparseable returns error" do

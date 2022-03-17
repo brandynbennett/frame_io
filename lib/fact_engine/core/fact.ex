@@ -65,4 +65,20 @@ defmodule FactEngine.Core.Fact do
   defp split_arguments(arguments) do
     String.split(arguments, ",") |> Enum.map(&String.trim/1)
   end
+
+  @doc """
+  Determines if a fact matches query
+
+  ## Examples
+      iex> Fact.new(statement: "are_friends", arguments: ["alex", "sam"])
+      ... |> Fact.matches?("are_friends (alex, sam))
+      true
+
+      iex> Fact.new(statement: "are_friends", arguments: ["alex", "sam"])
+      ... |> Fact.matches?("are_friends (X, Y))
+      %{X: "alex", Y: "sam"}
+  """
+  def matches?(%__MODULE__{} = _fact, _query) do
+    true
+  end
 end

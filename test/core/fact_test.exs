@@ -43,4 +43,11 @@ defmodule FactEngine.Core.FactTest do
                Fact.from_string("foo")
     end
   end
+
+  describe "matches?/2" do
+    test "true for 2 arg match" do
+      assert Fact.new(statement: "are_friends", arguments: ["alex", "sam"])
+             |> Fact.matches?("are_friends (alex, sam)")
+    end
+  end
 end

@@ -1,7 +1,7 @@
 defmodule FactEngine.Core.FactTest do
   use ExUnit.Case, async: false
 
-  alias FactEngine.Core.Fact
+  alias FactEngine.Core.{Fact, Query}
 
   describe "from_string/1" do
     test "creates new fact from two args" do
@@ -46,8 +46,10 @@ defmodule FactEngine.Core.FactTest do
 
   describe "matches?/2" do
     test "true for 2 arg match" do
+      query = Query.new(statement: "are_friends", arguments: ["alex", "sam"])
+
       assert Fact.new(statement: "are_friends", arguments: ["alex", "sam"])
-             |> Fact.matches?("are_friends (alex, sam)")
+             |> Fact.matches?(query)
     end
   end
 end

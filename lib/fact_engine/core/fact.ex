@@ -9,6 +9,8 @@ defmodule FactEngine.Core.Fact do
     `alex`, and `sam` would be the arguments
   """
 
+  alias FactEngine.Core.Query
+
   @type t :: %__MODULE__{
           statement: String.t() | nil,
           arguments: [String.t()]
@@ -70,15 +72,21 @@ defmodule FactEngine.Core.Fact do
   Determines if a fact matches query
 
   ## Examples
+      iex> query = Query.new(statement: "are_friends", arguments: ["alex", "sam"])
       iex> Fact.new(statement: "are_friends", arguments: ["alex", "sam"])
-      ... |> Fact.matches?("are_friends (alex, sam))
+      ... |> Fact.matches?(query)
       true
 
+      iex> query = Query.new(statement: "are_friends", arguments: ["X", "Y"])
       iex> Fact.new(statement: "are_friends", arguments: ["alex", "sam"])
-      ... |> Fact.matches?("are_friends (X, Y))
+      ... |> Fact.matches?(query)
       %{X: "alex", Y: "sam"}
   """
-  def matches?(%__MODULE__{} = _fact, _query) do
-    true
+  def matches?(%__MODULE__{} = fact, %Query{} = query) do
+    statements_match?(fact.statement, query.statement)
+  end
+
+  defp statements_match?(statement1, statement2) do
+    statement1 == statement2
   end
 end

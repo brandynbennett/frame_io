@@ -16,7 +16,7 @@ defmodule FactEngine.Core.Fact do
 
   defstruct statement: nil, arguments: []
 
-  @fact_regex ~r/([\w_]+)\s?\((\w+)+(?:,\s?(\w+))?\)/
+  @fact_regex ~r/([\w_]+)\s?\((\w+)*(?:,\s?(\w+))?\)/
 
   @doc """
   Create a new Fact
@@ -37,12 +37,24 @@ defmodule FactEngine.Core.Fact do
       {:error, ":foo is not a valid fact"}
   """
   @spec from_string(String.t()) :: {:ok, t()} | {:error, String.t()}
-  def from_string(str) do
+  def from_string(str) when is_binary(str) do
     Regex.run(@fact_regex, str, capture: :all_but_first)
-    |> from_list()
+    |> from_list(str)
   end
 
-  defp from_list([statement | arguments]) do
+  def from_string(str) do
+    {:error, "Fact.from_string/1 expects a String, got #{str}"}
+  end
+
+  defp from_list(nil, str) do
+    {:error, "#{str} is not a valid fact"}
+  end
+
+  defp from_list([_statement | []], _str) do
+    {:error, "Facts must have on or more arguments"}
+  end
+
+  defp from_list([statement | arguments], _str) do
     {:ok, new(statement: statement, arguments: arguments)}
   end
 end

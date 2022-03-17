@@ -16,6 +16,8 @@ defmodule FactEngine.Core.Fact do
 
   defstruct statement: nil, arguments: []
 
+  @fact_regex ~r/([\w_]+)\s?\((\w+)+(?:,\s?(\w+))?\)/
+
   @doc """
   Create a new Fact
   """
@@ -29,10 +31,18 @@ defmodule FactEngine.Core.Fact do
 
   ## Examples
       iex> Fact.from_string("are_friends (alex, sam)")
-      %Fact{statement: "are_friends", arguments: ["alex", "sam"]}
+      {:ok, %Fact{statement: "are_friends", arguments: ["alex", "sam"]}}
+
+      iex> Fact.from_string(:foo)
+      {:error, ":foo is not a valid fact"}
   """
-  @spec from_string(String.t()) :: t()
-  def from_string(_str) do
-    new()
+  @spec from_string(String.t()) :: {:ok, t()} | {:error, String.t()}
+  def from_string(str) do
+    Regex.run(@fact_regex, str, capture: :all_but_first)
+    |> from_list()
+  end
+
+  defp from_list([statement | arguments]) do
+    {:ok, new(statement: statement, arguments: arguments)}
   end
 end

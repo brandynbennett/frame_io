@@ -21,4 +21,35 @@ defmodule FactEngine.Boundary.FactManagerTest do
     FactManager.new()
     assert FactManager.add_fact("foo") == {:error, "foo is not a valid fact"}
   end
+
+  test "query_facts/1 gives map result" do
+    FactManager.new([
+      Fact.new(statement: "is_a_cat", arguments: ["garfield"]),
+      Fact.new(statement: "are_friends", arguments: ["alex", "sam"]),
+      Fact.new(statement: "are_friends", arguments: ["jane", "bob"])
+    ])
+
+    assert FactManager.query_facts("are_friends (X, Y)") == [
+             %{"X" => "alex", "Y" => "sam"},
+             %{"X" => "jane", "Y" => "bob"}
+           ]
+  end
+
+  test "query_facts/1 gives true result" do
+    FactManager.new([
+      Fact.new(statement: "are_friends", arguments: ["alex", "sam"]),
+      Fact.new(statement: "are_friends", arguments: ["jane", "bob"])
+    ])
+
+    assert FactManager.query_facts("are_friends (alex, sam)") == true
+  end
+
+  test "query_facts/1 gives false result" do
+    FactManager.new([
+      Fact.new(statement: "are_friends", arguments: ["alex", "sam"]),
+      Fact.new(statement: "are_friends", arguments: ["jane", "bob"])
+    ])
+
+    assert FactManager.query_facts("are_friends (smurf, foo)") == false
+  end
 end

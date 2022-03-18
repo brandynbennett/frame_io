@@ -9,8 +9,6 @@ defmodule FactEngine.Core.Fact do
     `alex`, and `sam` would be the arguments
   """
 
-  alias FactEngine.Core.Query
-
   @type t :: %__MODULE__{
           statement: String.t() | nil,
           arguments: [String.t()]
@@ -87,7 +85,7 @@ defmodule FactEngine.Core.Fact do
       ... |> Fact.matches?(query)
       false
   """
-  def matches?(%__MODULE__{} = fact, %Query{} = query) do
+  def matches?(%__MODULE__{} = fact, %__MODULE__{} = query) do
     fact_args = fact.arguments
     query_args = query.arguments
 

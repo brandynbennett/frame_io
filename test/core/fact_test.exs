@@ -66,6 +66,13 @@ defmodule FactEngine.Core.FactTest do
              |> Fact.matches?(query) == %{"X" => "alex", "Y" => "sam", "Z" => "brian"}
     end
 
+    test "true for same dynamic" do
+      query = Query.new(statement: "are_friends", arguments: ["X", "X"])
+
+      assert Fact.new(statement: "are_friends", arguments: ["alex", "alex"])
+             |> Fact.matches?(query) == %{"X" => "alex"}
+    end
+
     test "false for different length arguments" do
       query = Query.new(statement: "are_friends", arguments: ["sam"])
 
@@ -75,6 +82,13 @@ defmodule FactEngine.Core.FactTest do
 
     test "false for different statements" do
       query = Query.new(statement: "is_a_cat", arguments: ["alf"])
+
+      refute Fact.new(statement: "are_friends", arguments: ["alex", "sam"])
+             |> Fact.matches?(query)
+    end
+
+    test "false for same dynamic when facts are different" do
+      query = Query.new(statement: "are_friends", arguments: ["X", "X"])
 
       refute Fact.new(statement: "are_friends", arguments: ["alex", "sam"])
              |> Fact.matches?(query)

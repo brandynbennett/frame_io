@@ -52,6 +52,20 @@ defmodule FactEngine.Core.FactTest do
              |> Fact.matches?(query)
     end
 
+    test "true for 1 dynamic, 1 static" do
+      query = Query.new(statement: "are_friends", arguments: ["X", "sam"])
+
+      assert Fact.new(statement: "are_friends", arguments: ["alex", "sam"])
+             |> Fact.matches?(query) == %{"X" => "alex"}
+    end
+
+    test "true for all dynamic" do
+      query = Query.new(statement: "are_friends", arguments: ["X", "Y", "Z"])
+
+      assert Fact.new(statement: "are_friends", arguments: ["alex", "sam", "brian"])
+             |> Fact.matches?(query) == %{"X" => "alex", "Y" => "sam", "Z" => "brian"}
+    end
+
     test "false for different length arguments" do
       query = Query.new(statement: "are_friends", arguments: ["sam"])
 

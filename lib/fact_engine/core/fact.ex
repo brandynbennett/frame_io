@@ -80,7 +80,7 @@ defmodule FactEngine.Core.Fact do
       iex> query = Query.new(statement: "are_friends", arguments: ["X", "Y"])
       iex> Fact.new(statement: "are_friends", arguments: ["alex", "sam"])
       ... |> Fact.matches?(query)
-      %{X: "alex", Y: "sam"}
+      %{"X" => "alex", "Y" => "sam"}
 
       iex> query = Query.new(statement: "are_friends", arguments: ["X", "Y"])
       iex> Fact.new(statement: "are_friends", arguments: ["alex", "sam", "brian"])
@@ -88,33 +88,45 @@ defmodule FactEngine.Core.Fact do
       false
   """
   def matches?(%__MODULE__{} = fact, %Query{} = query) do
-    statements_match?(fact.statement, query.statement)
-    |> arguments_match?(fact.arguments, query.arguments)
+    fact_args = fact.arguments
+    query_args = query.arguments
+
+    with true <- statements_match?(fact.statement, query.statement),
+         true <- same_number_of_arguments?(fact_args, query_args),
+         result <- arguments_match?(fact_args, query_args) do
+      result
+    end
   end
 
   defp statements_match?(statement1, statement2) do
     statement1 == statement2
   end
 
-  defp arguments_match?(false, _, _), do: false
+  defp same_number_of_arguments?(fact_args, query_args) do
+    Enum.count(fact_args) == Enum.count(query_args)
+  end
 
-  defp arguments_match?(_matches, fact_args, query_args) do
-    if same_number_of_arguments?(fact_args, query_args) do
-      0..Enum.count(fact_args)
-      |> Enum.map(fn index ->
-        arguments_match?(Enum.at(fact_args, index), Enum.at(query_args, index))
-      end)
-      |> Enum.all?(&(&1 == true))
+  defp arguments_match?(fact_args, query_args) do
+    if dynamic_query?(query_args) do
+      %{}
     else
-      false
+      test_static_query(fact_args, query_args)
     end
   end
 
-  defp arguments_match?(fact_arg, query_arg) do
-    fact_arg == query_arg
+  defp dynamic_query?(query_args) do
+    Enum.any?(query_args, &dynamic_argument?/1)
   end
 
-  defp same_number_of_arguments?(fact_args, query_args) do
-    Enum.count(fact_args) == Enum.count(query_args)
+  defp dynamic_argument?(arg) do
+    Regex.match?(~r/[A-Z]/, String.at(arg, 0))
+  end
+
+  defp test_static_query(fact_args, query_args) do
+    0..Enum.count(fact_args)
+    |> Enum.map(fn index ->
+      Enum.at(fact_args, index) == Enum.at(query_args, index)
+    end)
+    |> Enum.all?(&(&1 == true))
   end
 end

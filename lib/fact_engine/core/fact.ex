@@ -102,18 +102,19 @@ defmodule FactEngine.Core.Fact do
     if same_number_of_arguments?(fact_args, query_args) do
       0..Enum.count(fact_args)
       |> Enum.map(fn index ->
-        nil
-        # arguments_match?(Enum.at(fact_args, index), Enum.at(query_args, index))
+        arguments_match?(Enum.at(fact_args, index), Enum.at(query_args, index))
       end)
+      |> Enum.all?(&(&1 == true))
     else
       false
     end
   end
 
+  defp arguments_match?(fact_arg, query_arg) do
+    fact_arg == query_arg
+  end
+
   defp same_number_of_arguments?(fact_args, query_args) do
     Enum.count(fact_args) == Enum.count(query_args)
   end
-
-  # defp arguments_match?(fact_arg, query_arg) do
-  # end
 end

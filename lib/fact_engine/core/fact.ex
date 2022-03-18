@@ -85,6 +85,7 @@ defmodule FactEngine.Core.Fact do
       ... |> Fact.matches?(query)
       false
   """
+  @spec matches?(t(), t()) :: boolean() | map()
   def matches?(%__MODULE__{} = fact, %__MODULE__{} = query) do
     fact_args = fact.arguments
     query_args = query.arguments

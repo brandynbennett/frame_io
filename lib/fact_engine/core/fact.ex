@@ -127,13 +127,7 @@ defmodule FactEngine.Core.Fact do
     end)
     |> Enum.group_by(&elem(&1, 0))
     |> Enum.reduce_while(%{}, fn {query_arg, fact_args}, acc ->
-      fact_args = Enum.map(fact_args, &elem(&1, 1))
-
-      if args_all_same?(fact_args) do
-        {:cont, Map.put(acc, query_arg, Enum.at(fact_args, 0))}
-      else
-        {:halt, false}
-      end
+      build_result_map(acc, query_arg, fact_args)
     end)
   end
 
@@ -142,6 +136,16 @@ defmodule FactEngine.Core.Fact do
       [{query_arg, fact_arg} | args]
     else
       args
+    end
+  end
+
+  defp build_result_map(results, query_arg, fact_args) do
+    fact_args = Enum.map(fact_args, &elem(&1, 1))
+
+    if args_all_same?(fact_args) do
+      {:cont, Map.put(results, query_arg, Enum.at(fact_args, 0))}
+    else
+      {:halt, false}
     end
   end
 

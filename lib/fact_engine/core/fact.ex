@@ -81,12 +81,39 @@ defmodule FactEngine.Core.Fact do
       iex> Fact.new(statement: "are_friends", arguments: ["alex", "sam"])
       ... |> Fact.matches?(query)
       %{X: "alex", Y: "sam"}
+
+      iex> query = Query.new(statement: "are_friends", arguments: ["X", "Y"])
+      iex> Fact.new(statement: "are_friends", arguments: ["alex", "sam", "brian"])
+      ... |> Fact.matches?(query)
+      false
   """
   def matches?(%__MODULE__{} = fact, %Query{} = query) do
     statements_match?(fact.statement, query.statement)
+    |> arguments_match?(fact.arguments, query.arguments)
   end
 
   defp statements_match?(statement1, statement2) do
     statement1 == statement2
   end
+
+  defp arguments_match?(false, _, _), do: false
+
+  defp arguments_match?(_matches, fact_args, query_args) do
+    if same_number_of_arguments?(fact_args, query_args) do
+      0..Enum.count(fact_args)
+      |> Enum.map(fn index ->
+        nil
+        # arguments_match?(Enum.at(fact_args, index), Enum.at(query_args, index))
+      end)
+    else
+      false
+    end
+  end
+
+  defp same_number_of_arguments?(fact_args, query_args) do
+    Enum.count(fact_args) == Enum.count(query_args)
+  end
+
+  # defp arguments_match?(fact_arg, query_arg) do
+  # end
 end

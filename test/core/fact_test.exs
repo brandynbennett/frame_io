@@ -51,5 +51,19 @@ defmodule FactEngine.Core.FactTest do
       assert Fact.new(statement: "are_friends", arguments: ["alex", "sam"])
              |> Fact.matches?(query)
     end
+
+    test "false for different length arguments" do
+      query = Query.new(statement: "are_friends", arguments: ["sam"])
+
+      refute Fact.new(statement: "are_friends", arguments: ["alex", "sam"])
+             |> Fact.matches?(query)
+    end
+
+    test "false for different statements" do
+      query = Query.new(statement: "is_a_cat", arguments: ["alf"])
+
+      refute Fact.new(statement: "are_friends", arguments: ["alex", "sam"])
+             |> Fact.matches?(query)
+    end
   end
 end

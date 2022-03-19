@@ -5,6 +5,8 @@ defmodule FactEngineCLI do
 
   alias FactEngine.Boundary.FactManager
 
+  @query_header "---\n"
+
   @doc """
   Read in file of FactEngine commands and perform operations on them
   """
@@ -28,7 +30,30 @@ defmodule FactEngineCLI do
     end
   end
 
+  defp process_line("QUERY " <> query) do
+    case FactManager.query_facts(query) do
+      {:error, message} -> stdout().put_error("ERROR #{message}")
+      results -> stdout().puts(format_query_results(results))
+    end
+  end
+
   defp stdout do
     Application.get_env(:fact_engine, :stdout)
+  end
+
+  defp format_query_results(results) when is_map(results) do
+    Enum.map_join(results, ", ", fn {key, value} ->
+      "#{key}: #{value}"
+    end)
+  end
+
+  defp format_query_results(results) when is_list(results) do
+    Enum.reduce(results, @query_header, fn result, acc ->
+      acc <> "#{format_query_results(result)}\n"
+    end)
+  end
+
+  defp format_query_results(results) do
+    "#{@query_header}#{results}\n"
   end
 end

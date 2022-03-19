@@ -5,7 +5,7 @@ defmodule FactEngineCLI do
 
   alias FactEngine.Boundary.FactManager
 
-  @query_header "---\n"
+  @query_header "---"
 
   @doc """
   Read in file of FactEngine commands and perform operations on them
@@ -48,12 +48,13 @@ defmodule FactEngineCLI do
   end
 
   defp format_query_results(results) when is_list(results) do
-    Enum.reduce(results, @query_header, fn result, acc ->
-      acc <> "#{format_query_results(result)}\n"
+    Enum.reduce(results, [@query_header], fn result, acc ->
+      Enum.concat(acc, ["#{format_query_results(result)}"])
     end)
+    |> Enum.join("\n")
   end
 
   defp format_query_results(results) do
-    "#{@query_header}#{results}\n"
+    "#{@query_header}\n#{results}"
   end
 end

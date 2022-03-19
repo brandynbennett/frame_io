@@ -51,11 +51,11 @@ defmodule FactEngineCliTest do
       response1 =
         ~s[---\n] <>
           ~s[X: alex, Y: sam\n] <>
-          ~s[X: frog, Y: toad\n]
+          ~s[X: frog, Y: toad]
 
       response2 =
         ~s[---\n] <>
-          ~s[true\n]
+          ~s[true]
 
       expect(STDOUTMock, :puts, 2, fn
         ^response1 -> :ok

@@ -94,7 +94,8 @@ defmodule FactEngine.Core.Fact do
          true <- same_number_of_arguments?(fact_args, query_args),
          combined <- combine_arguments(fact_args, query_args),
          true <- test_static_arguments(combined),
-         result <- test_dynamic_arguments(combined) do
+         result <- test_dynamic_arguments(combined),
+         result <- format_response(result) do
       result
     end
   end
@@ -146,5 +147,17 @@ defmodule FactEngine.Core.Fact do
 
   defp args_all_same?([first_arg | other_args]) do
     Enum.all?(other_args, &(&1 == first_arg))
+  end
+
+  defp format_response(result) when is_boolean(result) do
+    result
+  end
+
+  defp format_response(result) when map_size(result) == 0 do
+    true
+  end
+
+  defp format_response(result) do
+    result
   end
 end

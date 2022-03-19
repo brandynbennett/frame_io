@@ -49,7 +49,7 @@ defmodule FactEngine.Core.FactTest do
       query = Fact.new(statement: "are_friends", arguments: ["alex", "sam"])
 
       assert Fact.new(statement: "are_friends", arguments: ["alex", "sam"])
-             |> Fact.matches?(query)
+             |> Fact.matches?(query) == true
     end
 
     test "true for 1 dynamic, 1 static" do

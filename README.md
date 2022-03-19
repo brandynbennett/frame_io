@@ -1,21 +1,27 @@
 # FactEngine
 
-**TODO: Add description**
+Create and Query Facts
 
 ## Installation
 
-If [available in Hex](https://hex.pm/docs/publish), the package can be installed
-by adding `fact_engine` to your list of dependencies in `mix.exs`:
+[Install Elixir and Erlang](http://elixir-lang.org/install.html)
 
-```elixir
-def deps do
-  [
-    {:fact_engine, "~> 0.1.0"}
-  ]
-end
+## Usage
+
+Use the Mix task `mix fact_engine <file_path>` to execute `INPUT ` and `QUERY ` fact commands
+
+### Example
+
+```bash
+mix fact_engine instructions/examples/3/in.txt
+Compiling 1 file (.ex)
+---
+false
+---
+X: lucy
+X: garfield
+X: bowler_cat
+---
+FavoriteFood: lasagna
 ```
-
-Documentation can be generated with [ExDoc](https://github.com/elixir-lang/ex_doc)
-and published on [HexDocs](https://hexdocs.pm). Once published, the docs can
-be found at [https://hexdocs.pm/fact_engine](https://hexdocs.pm/fact_engine).
 

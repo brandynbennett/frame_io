@@ -1,7 +1,11 @@
 defmodule FactEngineCLI.STDOUTStub do
   @behaviour FactEngineCLI.STDOUTBehaviour
 
-  def puts(_device, _path) do
+  def puts(_path) do
     :ok
+  end
+
+  def put_error(path) do
+    path
   end
 end

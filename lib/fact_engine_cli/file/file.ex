@@ -6,6 +6,5 @@ defmodule FactEngineCLI.File do
 
   def stream!(path) do
     File.stream!(path)
-    |> Stream.map(&String.replace(&1, "\n", ""))
   end
 end

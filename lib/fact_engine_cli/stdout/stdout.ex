@@ -4,7 +4,11 @@ defmodule FactEngineCLI.STDOUT do
   """
   @behaviour FactEngineCLI.STDOUTBehaviour
 
-  def puts(device \\ :stdio, data) do
-    IO.puts(device, data)
+  def puts(data) do
+    IO.puts(data)
+  end
+
+  def put_error(data) do
+    IO.puts(:stderr, data)
   end
 end

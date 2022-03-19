@@ -107,5 +107,12 @@ defmodule FactEngine.Core.FactTest do
       refute Fact.new(statement: "are_friends", arguments: ["alex", "sam"])
              |> Fact.matches?(query)
     end
+
+    test "false for dynamic, when static deosn't match" do
+      query = Fact.new(statement: "are_friends", arguments: ["X", "jane"])
+
+      refute Fact.new(statement: "are_friends", arguments: ["alex", "sam"])
+             |> Fact.matches?(query)
+    end
   end
 end

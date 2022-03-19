@@ -92,7 +92,9 @@ defmodule FactEngine.Core.Fact do
 
     with true <- statements_match?(fact.statement, query.statement),
          true <- same_number_of_arguments?(fact_args, query_args),
-         result <- arguments_match?(fact_args, query_args) do
+         combined <- combine_arguments(fact_args, query_args),
+         true <- test_static_arguments(combined),
+         result <- test_dynamic_arguments(combined) do
       result
     end
   end
@@ -105,39 +107,29 @@ defmodule FactEngine.Core.Fact do
     Enum.count(fact_args) == Enum.count(query_args)
   end
 
-  defp arguments_match?(fact_args, query_args) do
-    if dynamic_query?(query_args) do
-      test_dynamic_query(fact_args, query_args)
-    else
-      test_static_query(fact_args, query_args)
-    end
-  end
-
-  defp dynamic_query?(query_args) do
-    Enum.any?(query_args, &dynamic_argument?/1)
-  end
-
-  defp dynamic_argument?(arg) do
-    Regex.match?(~r/[A-Z]/, String.at(arg, 0))
-  end
-
-  defp test_dynamic_query(fact_args, query_args) do
+  defp combine_arguments(fact_args, query_args) do
     Enum.with_index(fact_args)
-    |> Enum.reduce([], fn {fact_arg, index}, acc ->
-      combine_args(acc, fact_arg, Enum.at(query_args, index))
+    |> Enum.map(fn {fact_arg, index} ->
+      query_arg = Enum.at(query_args, index)
+      {query_arg, fact_arg}
     end)
+  end
+
+  defp test_static_arguments(arguments) do
+    Enum.filter(arguments, &(!dynamic_argument?(elem(&1, 0))))
+    |> Enum.all?(&(elem(&1, 0) == elem(&1, 1)))
+  end
+
+  defp test_dynamic_arguments(arguments) do
+    Enum.filter(arguments, &dynamic_argument?(elem(&1, 0)))
     |> Enum.group_by(&elem(&1, 0))
     |> Enum.reduce_while(%{}, fn {query_arg, fact_args}, acc ->
       build_result_map(acc, query_arg, fact_args)
     end)
   end
 
-  defp combine_args(args, fact_arg, query_arg) do
-    if dynamic_argument?(query_arg) do
-      [{query_arg, fact_arg} | args]
-    else
-      args
-    end
+  defp dynamic_argument?(arg) do
+    Regex.match?(~r/[A-Z]/, String.at(arg, 0))
   end
 
   defp build_result_map(results, query_arg, fact_args) do
@@ -154,13 +146,5 @@ defmodule FactEngine.Core.Fact do
 
   defp args_all_same?([first_arg | other_args]) do
     Enum.all?(other_args, &(&1 == first_arg))
-  end
-
-  defp test_static_query(fact_args, query_args) do
-    Enum.with_index(fact_args)
-    |> Enum.map(fn {fact_arg, index} ->
-      fact_arg == Enum.at(query_args, index)
-    end)
-    |> Enum.all?(&(&1 == true))
   end
 end

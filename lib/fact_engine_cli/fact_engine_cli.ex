@@ -37,6 +37,10 @@ defmodule FactEngineCLI do
     end
   end
 
+  defp process_line(other) do
+    stdout().puts("#{other} is not a valid command")
+  end
+
   defp stdout do
     Application.get_env(:fact_engine, :stdout)
   end
